@@ -9,6 +9,7 @@ import { JourneyCard } from "../components/JourneyCard";
 import { QuickActionTiles } from "../components/QuickAction";
 import { MapCard } from "../components/MapCard";
 import { api } from "../lib/api";
+import { DEFAULT_TRIP_IMAGE } from "../lib/assets";
 
 export const Home: React.FC = () => {
   const [weather, setWeather] = useState<any>(null);
@@ -88,7 +89,7 @@ export const Home: React.FC = () => {
                     status: featuredTrip.status,
                     cover_url: featuredTrip.cover_photo_id
                       ? `/api/trips/${featuredTrip.id}/photos/${featuredTrip.cover_photo_id}/thumb`
-                      : "/seed/photos/beach_sunset.jpg",
+                      : DEFAULT_TRIP_IMAGE,
                     distance_km: featuredTrip.distance_m
                       ? Math.round(featuredTrip.distance_m / 100) / 10
                       : 12.4,
@@ -144,7 +145,7 @@ export const Home: React.FC = () => {
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="font-serif text-2xl sm:text-3xl text-ink font-normal">
+            <h2 className="font-serif text-2xl sm:text-3xl text-ink font-normal break-words">
               Recent Journeys
             </h2>
             <p className="text-xs sm:text-sm text-ink-muted font-sans mt-0.5">
@@ -176,7 +177,7 @@ export const Home: React.FC = () => {
                 coverUrl={
                   trip.cover_photo_id
                     ? `/api/trips/${trip.id}/photos/${trip.cover_photo_id}/thumb`
-                    : "/seed/photos/beach_sunset.jpg"
+                    : DEFAULT_TRIP_IMAGE
                 }
                 rating={trip.rating || 4.8}
                 distanceKm={

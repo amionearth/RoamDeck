@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Heart, MessageSquare, Star, MapPin, Compass, Navigation } from "lucide-react";
 import { TopBar } from "../components/TopBar";
 import { api } from "../lib/api";
+import { FallbackImage } from "../components/FallbackImage";
+import { DEFAULT_TRIP_IMAGE } from "../lib/assets";
 
 export const Feed: React.FC = () => {
   const [trips, setTrips] = useState<any[]>([]);
@@ -71,9 +73,9 @@ export const Feed: React.FC = () => {
       />
 
       {/* 2. Header and Mood Filter Pills */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl sm:text-4xl text-ink font-normal">
+          <h1 className="font-serif text-3xl sm:text-4xl text-ink font-normal break-words">
             Explorer Feed
           </h1>
           <p className="mt-1 text-sm text-ink-muted font-sans">
@@ -82,7 +84,7 @@ export const Feed: React.FC = () => {
         </div>
 
         {/* Mood Filter Pills */}
-        <div className="inline-flex p-1 rounded-full glass border border-white/40 self-start sm:self-auto overflow-x-auto max-w-full">
+        <div className="flex flex-wrap gap-1 p-1 rounded-full glass border border-white/40 self-start max-w-full">
           {["all", "calm", "curious", "chaotic", "romantic", "social"].map((m) => (
             <button
               key={m}
@@ -117,7 +119,7 @@ export const Feed: React.FC = () => {
               : trip.title || "Blind coastal adventure";
             const coverImage = trip.cover_photo_id
               ? `/api/trips/${trip.id}/photos/${trip.cover_photo_id}/thumb`
-              : "/seed/photos/beach_sunset.jpg";
+              : DEFAULT_TRIP_IMAGE;
 
             return (
               <Link
@@ -128,7 +130,7 @@ export const Feed: React.FC = () => {
                 <div>
                   {/* Image container */}
                   <div className="relative aspect-[16/10] rounded-inner overflow-hidden bg-white/20">
-                    <img
+                    <FallbackImage
                       src={coverImage}
                       alt={displayTitle}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -166,10 +168,10 @@ export const Feed: React.FC = () => {
 
                   {/* Card Body */}
                   <div className="p-3">
-                    <h3 className="font-serif text-xl text-ink font-normal leading-snug line-clamp-1 group-hover:text-teal-800 transition-colors">
+                    <h3 className="font-serif text-xl text-ink font-normal leading-snug line-clamp-1 break-words group-hover:text-teal-800 transition-colors">
                       {displayTitle}
                     </h3>
-                    <p className="mt-1 text-xs text-ink-muted font-sans line-clamp-2">
+                    <p className="mt-1 text-xs text-ink-muted font-sans line-clamp-2 break-words">
                       {trip.description ||
                         "A spontaneous blind journey guided by compass bearings and local sensory clues."}
                     </p>
@@ -182,7 +184,7 @@ export const Feed: React.FC = () => {
                     <div className="w-6 h-6 rounded-full bg-teal-800 text-white text-[10px] flex items-center justify-center font-serif">
                       {(trip.owner_name || "A")[0].toUpperCase()}
                     </div>
-                    <span className="text-teal-950 font-medium">{trip.owner_name || "Explorer"}</span>
+                    <span className="min-w-0 truncate text-teal-950 font-medium">{trip.owner_name || "Explorer"}</span>
                   </div>
 
                   <div className="flex items-center gap-3">

@@ -4,6 +4,7 @@ import { StampCase } from "../components/StampCase";
 import { StampModal } from "../components/StampModal";
 import { MapCard } from "../components/MapCard";
 import { api } from "../lib/api";
+import { DEFAULT_TRIP_IMAGE } from "../lib/assets";
 
 export const Passport: React.FC = () => {
   const [passportData, setPassportData] = useState<any>(null);
@@ -141,7 +142,7 @@ export const Passport: React.FC = () => {
           </p>
         </div>
 
-        <div className="inline-flex p-1 rounded-full glass border border-white/40 self-start sm:self-auto overflow-x-auto max-w-full">
+        <div className="flex flex-wrap gap-1 p-1 rounded-full glass border border-white/40 self-start max-w-full">
           {["all", "common", "rare", "epic", "legendary"].map((r) => (
             <button
               key={r}
@@ -177,7 +178,7 @@ export const Passport: React.FC = () => {
                 duration_minutes: stamp.duration_minutes || 75,
                 rating: stamp.rating || 4.9,
                 created_at: stamp.earned_at || stamp.created_at,
-                image_url: stamp.image_url || stamp.cover_url || "/seed/photos/beach_sunset.jpg",
+                image_url: stamp.image_url || stamp.cover_url || DEFAULT_TRIP_IMAGE,
               }}
               orientation="landscape"
               onOpen={() =>
@@ -190,7 +191,7 @@ export const Passport: React.FC = () => {
                   duration_minutes: stamp.duration_minutes || 75,
                   rating: stamp.rating || 4.9,
                   created_at: stamp.earned_at || stamp.created_at,
-                  image_url: stamp.image_url || stamp.cover_url || "/seed/photos/beach_sunset.jpg",
+                  image_url: stamp.image_url || stamp.cover_url || DEFAULT_TRIP_IMAGE,
                 })
               }
             />

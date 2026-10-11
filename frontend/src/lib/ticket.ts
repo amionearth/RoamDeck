@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import { DEFAULT_TRIP_IMAGE } from "./assets";
 
 export interface StampOptions {
   orientation: "portrait" | "landscape";
@@ -24,8 +25,15 @@ const RARITY_ACCENT_COLORS: Record<string, string> = {
 // Helper to convert an image URL (or local path) to a base64 Data URL
 async function imageUrlToDataUrl(url: string): Promise<string> {
   try {
-    const res = await fetch(url);
-    const blob = await res.blob();
+    let response = await fetch(url);
+    if (!response.ok || !response.headers.get("content-type")?.startsWith("image/")) {
+      response = await fetch(DEFAULT_TRIP_IMAGE);
+    }
+    if (!response.ok || !response.headers.get("content-type")?.startsWith("image/")) {
+      throw new Error("Could not load the stamp image or its bundled fallback");
+    }
+
+    const blob = await response.blob();
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result as string);

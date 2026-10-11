@@ -18,6 +18,8 @@ import { MapCard } from "../components/MapCard";
 import { StampCase } from "../components/StampCase";
 import { StampModal } from "../components/StampModal";
 import { BlobImage } from "../components/BlobImage";
+import { FallbackImage } from "../components/FallbackImage";
+import { DEFAULT_TRIP_IMAGE } from "../lib/assets";
 import { api } from "../lib/api";
 import { realtime } from "../lib/ws";
 import { useAuth } from "../lib/auth";
@@ -72,7 +74,7 @@ export const TripPage: React.FC = () => {
             created_at: tripRes.created_at,
             cover_url: tripRes.cover_photo_id
               ? `/api/trips/${id}/photos/${tripRes.cover_photo_id}/thumb`
-              : "/seed/photos/beach_sunset.jpg",
+              : DEFAULT_TRIP_IMAGE,
           });
         }
       }
@@ -258,7 +260,7 @@ export const TripPage: React.FC = () => {
                 src={
                   trip.cover_photo_id
                     ? `/api/trips/${trip.id}/photos/${trip.cover_photo_id}/thumb`
-                    : "/seed/photos/beach_sunset.jpg"
+                    : DEFAULT_TRIP_IMAGE
                 }
                 alt={displayTitle}
                 blobIndex={1}
@@ -353,7 +355,7 @@ export const TripPage: React.FC = () => {
                     key={photo.id}
                     className="group relative rounded-inner overflow-hidden border border-white/30 bg-white/10 aspect-[4/3] flex flex-col justify-end"
                   >
-                    <img
+                    <FallbackImage
                       src={photo.thumb_url || photo.url}
                       alt={photo.caption || "Journey photo"}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

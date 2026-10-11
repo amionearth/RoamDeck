@@ -1,5 +1,6 @@
 import React, { useId } from "react";
 import { NORMALIZED_BLOBS } from "../styles/blobs";
+import { FallbackImage } from "./FallbackImage";
 
 interface BlobImageProps {
   src: string;
@@ -29,7 +30,7 @@ export const BlobImage: React.FC<BlobImageProps> = ({
           </clipPath>
         </defs>
       </svg>
-      <img
+      <FallbackImage
         src={src}
         alt={alt}
         style={{ clipPath: `url(#${clipId})` }}

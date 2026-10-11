@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Compass, Radio, Users, ChevronRight, Navigation } from "lucide-react";
 import { BlobImage } from "./BlobImage";
+import { DEFAULT_TRIP_IMAGE } from "../lib/assets";
 
 interface HeroPanelProps {
   trip: {
@@ -26,7 +27,7 @@ export const HeroPanel: React.FC<HeroPanelProps> = ({ trip }) => {
             <Compass className="w-3.5 h-3.5 text-teal-700" />
             Device ready for exploration
           </span>
-          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-ink leading-tight">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-ink leading-tight break-words">
             No blind expedition currently active.
           </h1>
           <p className="mt-3 text-sm sm:text-base text-ink-muted font-sans leading-relaxed">
@@ -54,7 +55,7 @@ export const HeroPanel: React.FC<HeroPanelProps> = ({ trip }) => {
 
   const isLive = trip.status === "in_progress";
   const displayTitle = trip.revealed ? trip.destination || trip.title : trip.title || "Blind coastal adventure";
-  const coverImage = trip.cover_url || "/seed/photos/beach_sunset.jpg";
+  const coverImage = trip.cover_url || DEFAULT_TRIP_IMAGE;
 
   return (
     <div className="glass rounded-card p-6 sm:p-8 lg:p-10 border border-white/40 relative overflow-hidden min-h-[380px] lg:min-h-[420px] flex flex-col justify-between">
@@ -96,7 +97,7 @@ export const HeroPanel: React.FC<HeroPanelProps> = ({ trip }) => {
 
       {/* Hero Headline & Intro */}
       <div className="relative z-10 max-w-xl">
-        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-ink leading-tight">
+        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-ink leading-tight break-words">
           {displayTitle}
         </h1>
         <p className="mt-3 text-sm sm:text-base text-ink-muted font-sans max-w-md leading-relaxed">

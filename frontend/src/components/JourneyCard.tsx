@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Star, Compass } from "lucide-react";
+import { FallbackImage } from "./FallbackImage";
+import { DEFAULT_TRIP_IMAGE } from "../lib/assets";
 
 interface JourneyCardProps {
   id: string;
@@ -27,7 +29,7 @@ export const JourneyCard: React.FC<JourneyCardProps> = ({
 }) => {
   // If not revealed, NEVER show destination name (anti-spoiler)
   const displayTitle = revealed ? destination || title : title || "Blind expedition";
-  const imageSrc = coverUrl || "/seed/photos/beach_sunset.jpg";
+  const imageSrc = coverUrl || DEFAULT_TRIP_IMAGE;
 
   return (
     <Link
@@ -35,7 +37,7 @@ export const JourneyCard: React.FC<JourneyCardProps> = ({
       className="group block rounded-card overflow-hidden glass p-2 transition-all duration-300 hover:shadow-card hover:-translate-y-1 hover:border-white/60"
     >
       <div className="relative aspect-[4/3] rounded-inner overflow-hidden bg-white/20">
-        <img
+        <FallbackImage
           src={imageSrc}
           alt={displayTitle}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

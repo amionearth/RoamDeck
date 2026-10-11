@@ -4,8 +4,15 @@ C:\Users\LENOVO\Desktop\project\layover\RoamDeck\backend\app\routers\leaderboard
   range: str = Query("all", regex="^(all|week)$"),
 C:\Users\LENOVO\Desktop\project\layover\RoamDeck\backend\app\routers\leaderboard.py:23: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
   metric: str = Query("points", regex="^(points|places|photos)$"),
-INFO:     Started server process [8716]
+INFO:     Started server process [7960]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:httpx:HTTP Request: GET https://api.open-meteo.com/v1/forecast?latitude=11.2588&longitude=75.7804&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&forecast_days=1 "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:50557 - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     192.168.1.122:40760 - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:     192.168.1.122:49060 - "WebSocket /ws" [accepted]
+INFO:     connection open
 INFO:httpx:HTTP Request: GET https://api.open-meteo.com/v1/forecast?latitude=11.2588&longitude=75.7804&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&forecast_days=1 "HTTP/1.1 200 OK"

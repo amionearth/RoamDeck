@@ -56,7 +56,7 @@ export const StampCase: React.FC<StampCaseProps> = ({
               })
             : "Oct 11, 2026",
           subtitle: "Coastal Blind Expedition",
-          imageUrl: stamp.image_url || stamp.cover_url || "/seed/photos/beach_sunset.jpg",
+          imageUrl: stamp.image_url || stamp.cover_url || "/seed/photos/kappad_beach_sunset.jpg",
           tripUrl: `${window.location.origin}/trips/${stamp.trip_id || stamp.id}`,
           rarity: stamp.rarity || "rare",
           serial: stamp.id.slice(0, 10).toUpperCase(),
