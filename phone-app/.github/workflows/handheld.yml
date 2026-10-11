@@ -1,0 +1,84 @@
+name: handheld
+
+# The brief's M0 acceptance check: "CI running tests on a laptop". This runs the
+# whole suite on Linux and Windows, with no hardware, no network and no LLM keys.
+on:
+  push:
+    paths:
+      - "phone-app/**"
+      - ".github/workflows/handheld.yml"
+  pull_request:
+    paths:
+      - "phone-app/**"
+      - ".github/workflows/handheld.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: tests (${{ matrix.os }}, python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12"]
+    defaults:
+      run:
+        working-directory: phone-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: phone-app/requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # PySide6 is deliberately NOT installed here: the whole suite must pass
+          # without a GUI toolkit, which is what proves the --headless path works.
+          python -m pip install pydantic requests qrcode Pillow PyYAML numpy websockets pytest
+
+      - name: Run the tests
+        env:
+          FFH_FORCE_SIM: "1"
+        run: python -m pytest -q
+
+      - name: Self test (proves every HAL device can be built on this machine)
+        env:
+          FFH_FORCE_SIM: "1"
+        run: python run.py --self-test
+
+      - name: Scripted demo (end-to-end, no network)
+        env:
+          FFH_FORCE_SIM: "1"
+        run: python run.py --demo --fast
+
+      - name: Planner fuzzer
+        env:
+          FFH_FORCE_SIM: "1"
+        run: python tools/plan_fuzzer.py --count 60 --seed 1
+
+      - name: GPX replay (geofences in order)
+        env:
+          FFH_FORCE_SIM: "1"
+        run: python tools/gpx_replay.py --speed 25
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: phone-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip ruff
+      - name: Ruff
+        # The rule set lives in pyproject.toml: bug-focused (E9, F, B), with the
+        # three deliberate exceptions documented there.
+        run: ruff check farfromhome_device tests tools run.py

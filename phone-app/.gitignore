@@ -1,0 +1,19 @@
+.env
+data/
+*.db
+*.db-wal
+*.db-shm
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+# Never commit a device token or a trip photo
+**/device_token
+**/*.jpg
+!docs/**/*.jpg
+!farfromhome_device/ui/assets/*.jpg

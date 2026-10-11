@@ -1,0 +1,37 @@
+[tool.ruff]
+# Python 3.11+ (the brief's requirement). Line length is not enforced: this
+# codebase uses long descriptive names and wrapped docstrings on purpose.
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E9", "F", "B"]
+ignore = [
+    # Module-level imports after sys.path surgery are deliberate in run.py and tools/.
+    "E402",
+    # `zip()` without `strict=True`: every zip in this codebase iterates parallel
+    # lists built from the same source, so a length mismatch cannot happen silently.
+    # Adding `strict=True` everywhere would be 11 extra parameters that assert
+    # nothing.
+    "B905",
+    # `pytest.raises(Exception)` in two schema tests: the point there is "this input
+    # is rejected", and pinning the exact pydantic error class would make the test
+    # brittle against a pydantic upgrade for no benefit.
+    "B017",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# `__init__.py` files exist to re-export, so imported-and-unused is the intent.
+"**/__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["farfromhome_device"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The suite runs with no hardware and no network. `-q` keeps CI output readable;
+# add `-x` locally to stop at the first failure.
+addopts = "-q"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

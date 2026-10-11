@@ -1,0 +1,158 @@
+# Game templates. Adding a game means adding a YAML file here, not writing code
+# (brief 02 §B2 step 1: "Templates are YAML files; adding a game must not require
+# new code.").
+#
+# Fields
+#   type             must match a GameModule's `type`, or "generic" for local-only
+#   title            shown on the configure screen
+#   game_types       which built-in module to use on the handheld (photo_hunt | bingo)
+#   approval         peer_vote | auto | host        (default peer_vote)
+#   win_condition    most_points | first_n_in_row   (default most_points)
+#   n                tiles needed in a row for bingo (default 5)
+#   players          min / max
+#   duration_options minutes offered on the configure screen
+#   default_duration default minutes
+#   difficulty       gentle | normal | spicy  (only changes defaults)
+#   theme            free text used by the prompt and by the UI accent
+#   penalty          shown at the end ("loser buys a treat")
+#   items            the built-in default items, used when LLM generation fails
+#   requires_players some games only make sense with 2+ people
+
+- type: color_hunt
+  title: Colour hunt
+  game_types: color_hunt
+  approval: auto
+  win_condition: most_points
+  players: { min: 1, max: 6 }
+  duration_options: [10, 15, 20, 30]
+  default_duration: 15
+  difficulty: gentle
+  theme: colour
+  penalty: "the slowest colour buys the drinks"
+  items:
+    - { key: red,    text: "Photograph something red",    points: 10 }
+    - { key: blue,   text: "Photograph something blue",   points: 10 }
+    - { key: yellow, text: "Photograph something yellow", points: 10 }
+    - { key: green,  text: "Photograph something green",  points: 10 }
+    - { key: orange, text: "Photograph something orange", points: 15 }
+    - { key: purple, text: "Photograph something purple", points: 20 }
+    - { key: pink,   text: "Photograph something pink",   points: 15 }
+    - { key: white,  text: "Photograph something white",  points: 5 }
+
+- type: bingo
+  title: Bingo walk
+  game_types: bingo
+  approval: peer_vote
+  win_condition: first_n_in_row
+  n: 5
+  players: { min: 2, max: 8 }
+  duration_options: [20, 30, 45, 60]
+  default_duration: 30
+  difficulty: normal
+  theme: classic
+  penalty: "the losing team buys the winners a treat"
+  items:
+    - "a red door"
+    - "a cat"
+    - "a bicycle"
+    - "a hand-painted sign"
+    - "a flower box"
+    - "a bench with a view"
+    - "a bird in flight"
+    - "something blue"
+    - "a cup of coffee"
+    - "a poster older than a year"
+    - "a potted plant"
+    - "a reflection"
+    - "a bridge"
+    - "a person reading"
+    - "a wall of graffiti"
+    - "a paper lantern"
+    - "a spice"
+    - "a boat"
+    - "a statue"
+    - "a staircase"
+    - "a hanging cloth"
+    - "a mango"
+    - "a street dog sleeping"
+    - "a coconut"
+    - "a window with curtains"
+
+- type: photo_hunt
+  title: Photo hunt
+  game_types: photo_hunt
+  approval: peer_vote
+  win_condition: most_points
+  players: { min: 1, max: 8 }
+  duration_options: [15, 30, 45, 60]
+  default_duration: 30
+  difficulty: normal
+  theme: creatures
+  penalty: "the lowest score carries the bags"
+  items:
+    - { key: old,        text: "Photograph something older than you",              points: 15 }
+    - { key: reflection, text: "Photograph a reflection that is not a mirror",     points: 20 }
+    - { key: door,       text: "Photograph a door that looks like it has a story", points: 15 }
+    - { key: colour,     text: "Photograph a colour you cannot name quickly",      points: 25 }
+    - { key: hand,       text: "Photograph something exactly one hand wide",       points: 15 }
+    - { key: sign,       text: "Photograph a sign with a spelling mistake",        points: 20 }
+    - { key: wind,       text: "Photograph something that moves in the wind",      points: 10 }
+    - { key: pattern,    text: "Photograph a pattern that repeats three times",    points: 20 }
+    - { key: small,      text: "Photograph the smallest living thing you can find", points: 20 }
+
+- type: secret_missions
+  title: Secret missions
+  game_types: secret_missions
+  approval: host
+  win_condition: most_points
+  players: { min: 2, max: 8 }
+  duration_options: [20, 30, 45]
+  default_duration: 30
+  difficulty: spicy
+  theme: mischief
+  penalty: "the last mission completed buys the snacks"
+  items:
+    - "Make the group laugh without saying a word. Photo as proof."
+    - "Get a stranger to wave at the camera (politely)."
+    - "Find a spot where you cannot hear traffic, and photograph the silence."
+    - "Photograph the group from below, all looking up."
+    - "Trade one item with another player and photograph the swap."
+    - "Find the best seat in the area and photograph the view from it."
+
+- type: funny_tasks
+  title: Silly tasks
+  game_types: funny_tasks
+  approval: peer_vote
+  win_condition: most_points
+  players: { min: 2, max: 10 }
+  duration_options: [15, 30, 45]
+  default_duration: 30
+  difficulty: gentle
+  theme: silly
+  penalty: "everyone points at the loser for ten seconds"
+  items:
+    - "Photograph your best 'I meant to do that' face at the next corner."
+    - "Find the most dramatic shadow you can and pose in it."
+    - "Ask someone for directions to somewhere you are not going, and photograph their hands."
+    - "Take a photo that looks like an album cover."
+    - "Find something the same colour as your shoes."
+    - "Photograph a view that would look good on a postcard from 1974."
+    - "Recreate a famous painting with whatever is nearby."
+    - "Photograph the group mid-laugh."
+
+- type: imposter
+  title: Imposter
+  game_types: imposter
+  approval: host
+  win_condition: most_points
+  players: { min: 3, max: 10 }
+  duration_options: [15, 20, 30]
+  default_duration: 20
+  difficulty: normal
+  theme: social
+  penalty: "the imposter buys the round"
+  requires_players: 3
+  items:
+    - "Everyone gets the same word except one player. Describe it without saying it."
+    - "Photograph the moment you think you spotted the imposter."
+    - "Vote. The imposter scores if they survive."

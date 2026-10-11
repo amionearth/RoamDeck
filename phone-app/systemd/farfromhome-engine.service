@@ -1,0 +1,44 @@
+# FarFromHome handheld — the engine (deterministic live trip loop). No LLM calls.
+
+[Unit]
+Description=FarFromHome handheld - engine (live trip loop)
+Documentation=file:/opt/farfromhome/phone-app/docs/ARCHITECTURE.md
+After=network-online.target time-sync.target farfromhome-agent.service
+Wants=network-online.target time-sync.target
+# The engine needs the GPS serial port before it starts, or it boots into the
+# "searching for GPS" state.
+After=dev-serial0.device
+Wants=dev-serial0.device
+
+[Service]
+Type=simple
+User=farfromhome
+Group=farfromhome
+# dialout for the GPS serial port, gpio for the buttons, video for the camera,
+# audio for the mic and speaker, i2c for the IMU.
+SupplementaryGroups=dialout gpio video audio i2c
+WorkingDirectory=/opt/farfromhome/phone-app
+EnvironmentFile=-/etc/farfromhome/device.env
+# The live loop is the one thing the user feels, so it gets a normal priority and
+# a small but real CPU allowance (brief §5.2: 5-10 Hz).
+Nice=-2
+CPUWeight=200
+ExecStart=/opt/farfromhome/phone-app/.venv/bin/python -m farfromhome_device.app.main engine
+Restart=always
+RestartSec=2
+StartLimitIntervalSec=0
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ffh-engine
+StateDirectory=farfromhome
+RuntimeDirectory=farfromhome
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/farfromhome /opt/farfromhome/phone-app/data
+# No network needed for the live loop; the outbox handles uploads.
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+
+[Install]
+WantedBy=multi-user.target

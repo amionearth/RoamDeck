@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="34">
+
+        <activity
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:launchMode="singleTask"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+    </application>
+
+    <!--
+      Permissions, each with the reason it is here.
+
+      INTERNET            the whole point: REST and WebSocket to the laptop.
+      ACCESS_NETWORK_STATE so the offline banner knows when to say "no network" instead of
+                          blaming the server.
+      ACCESS_FINE_LOCATION the compass, the trip track and the arrival check. Fine, not
+                          coarse: 2 km of accuracy would make the arrival radius meaningless.
+      ACCESS_COARSE_LOCATION as a fallback the OS may grant first.
+      CAMERA              photo tasks and game submissions.
+      high_samplerate     some devices only report a magnetometer heading at a high sensor
+                          rate, and a compass that updates once a second is unusable.
+      VIBRATE             the haptic tap that confirms a press outdoors.
+      POST_NOTIFICATIONS  Android 13+ requires this before anything can notify; the app
+                          uses it for the trip reminder, and refuses politely if denied.
+      WRITE_EXTERNAL / READ_MEDIA_IMAGES  saving a collage or stamp so the user can share it.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.high_samplerate" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- The compass and the camera are real features, so declare them as required
+         hardware only where they truly are. A tablet without a magnetometer should still
+         be able to plan and host a game. -->
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+</manifest>

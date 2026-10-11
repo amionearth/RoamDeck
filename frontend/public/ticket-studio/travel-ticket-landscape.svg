@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="900" height="420" viewBox="0 0 900 420">
+  <defs><filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity=".18"/></filter><pattern id="paper" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M0 16L16 0" stroke="#ddd" stroke-width=".5" opacity=".35"/></pattern></defs>
+  <rect width="900" height="420" fill="#171717"/>
+  <g filter="url(#shadow)">
+    <rect x="18" y="18" width="864" height="384" rx="22" fill="#fbfaf6"/>
+    <rect x="26" y="26" width="848" height="368" rx="16" fill="url(#paper)"/>
+    <rect x="38" y="38" width="310" height="344" rx="14" fill="#e6e3dc"/>
+    <image id="place-image" x="42" y="42" width="302" height="336" preserveAspectRatio="xMidYMid slice" href=""/>
+    <rect x="42" y="42" width="302" height="336" rx="12" fill="none" stroke="#fff" stroke-width="3"/>
+    <text id="ticket-date" x="382" y="76" font-family="Georgia,serif" font-size="23" fill="#171717">05 OCT 2026</text>
+    <text id="ticket-label" x="850" y="76" text-anchor="end" font-family="Arial,sans-serif" font-size="11" letter-spacing="2" fill="#777">OFF-MAP EXPLORATION</text>
+    <path d="M382 91 H850" stroke="#171717" stroke-width="1.5"/>
+    <text id="destination" x="382" y="142" font-family="Georgia,serif" font-size="34" fill="#111">DESTINATION NAME</text>
+    <text id="subtitle" x="382" y="170" font-family="Arial,sans-serif" font-size="12" letter-spacing="2" fill="#777">FOLLOW THE COMPASS. NOT THE CROWD.</text>
+    <text id="distance" x="382" y="224" font-family="Arial,sans-serif" font-size="18" fill="#171717">DISTANCE · 12.4 KM</text>
+    <text id="duration" x="382" y="256" font-family="Arial,sans-serif" font-size="18" fill="#171717">TIME · 45 MIN</text>
+    <text id="rating" x="382" y="290" font-family="Arial,sans-serif" font-size="20" fill="#171717">RATING · ★★★★☆ 4/5</text>
+    <text x="382" y="342" font-family="Arial,sans-serif" font-size="10" fill="#555">A MEMORY FROM THE ROAD — KEEP WANDERING.</text>
+    <g id="qr-slot"><rect x="772" y="290" width="72" height="72" fill="#fff" stroke="#171717" stroke-width="1"/></g>
+    <text x="808" y="376" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#171717">SCAN ME</text>
+    <path d="M366 28 V392" stroke="#171717" stroke-width="1.5" stroke-dasharray="2 5"/>
+    <circle cx="366" cy="18" r="12" fill="#171717"/><circle cx="366" cy="402" r="12" fill="#171717"/>
+  </g>
+</svg>

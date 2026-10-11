@@ -1,0 +1,36 @@
+# FarFromHome handheld — the all-in-one process.
+#
+# Use this when you want one process instead of four (a smaller Pi, a demo, or
+# debugging). It runs the same components; only the process boundary is gone.
+#
+# Choose ONE of farfromhome.service and the four individual units, never both.
+
+[Unit]
+Description=FarFromHome handheld - single process (agent + engine + ui + syncd)
+Documentation=file:/opt/farfromhome/phone-app/docs/ARCHITECTURE.md
+After=network-online.target time-sync.target
+Wants=network-online.target time-sync.target
+Conflicts=farfromhome-agent.service farfromhome-engine.service farfromhome-ui.service farfromhome-syncd.service
+
+[Service]
+Type=simple
+User=farfromhome
+Group=farfromhome
+SupplementaryGroups=dialout gpio video audio i2c render input
+WorkingDirectory=/opt/farfromhome/phone-app
+EnvironmentFile=-/etc/farfromhome/device.env
+Environment=QT_QPA_PLATFORM=eglfs
+Nice=0
+ExecStart=/opt/farfromhome/phone-app/.venv/bin/python -m farfromhome_device.app.main all
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=0
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ffh
+StateDirectory=farfromhome
+RuntimeDirectory=farfromhome
+ReadWritePaths=/var/lib/farfromhome /opt/farfromhome/phone-app/data
+
+[Install]
+WantedBy=graphical.target

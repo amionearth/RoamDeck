@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>FarFromHome</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+		<!-- The compass needs a magnetometer. It is declared required because a blind
+		     trip without a compass is not the product. -->
+		<string>magnetometer</string>
+		<string>gps</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+
+	<!--
+	  ===================================================================
+	  Permission strings.
+
+	  iOS refuses to show a permission prompt whose purpose string is missing, and it
+	  rejects the build outright. Each string below is the sentence the user actually
+	  reads, so they say what the app does with the permission and why, in plain words.
+	  ===================================================================
+	-->
+
+	<!-- Location: the compass, the track, and the arrival check. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>FarFromHome uses your location to point the compass at a destination that stays secret until you arrive, and to record the route you walked. Location is only used while a trip is running.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>FarFromHome uses your location while a trip is running so the compass keeps working when the screen locks. Location is never used outside a trip.</string>
+
+	<!-- Camera and photo library: photo tasks, game submissions, the collage. -->
+	<key>NSCameraUsageDescription</key>
+	<string>FarFromHome uses the camera for photo tasks and game challenges, and for the collage at the end of a trip.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>FarFromHome can attach a photo you already took as a task answer, and can save the collage and stamp it makes for you.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>FarFromHome saves the trip collage and your stamp to your photo library so you can share them.</string>
+
+	<!--
+	  Motion: the compass heading, and the step-level fallback when the magnetometer is
+	  disturbed by the phone's own battery or by nearby metal. iOS gates the compass
+	  behind this, and the app asks for it with its own prompt before using it.
+	-->
+	<key>NSMotionUsageDescription</key>
+	<string>FarFromHome uses the motion sensors to work out which way you are facing, so the arrow points the right way even when the magnetometer is disturbed.</string>
+
+	<!-- Microphone: the push-to-talk voice request on the Chat screen. -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>FarFromHome uses the microphone when you hold the button to describe a trip by voice. You can always type instead.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>FarFromHome uses speech recognition to turn your spoken trip request into a description. The audio is handled by your device.</string>
+
+	<!--
+	  Apple requires a declaration of what leaves the device. Nothing here is used for
+	  advertising or tracking, so that answer is honest rather than a checkbox.
+	-->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+
+	<!-- The app talks to a plain-http server on the local WiFi, which iOS blocks unless
+	     this is set. It is also what makes "same WiFi, laptop server" work with no
+	     certificate to install on the phone. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

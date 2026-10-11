@@ -1,0 +1,43 @@
+# FarFromHome handheld — the UI process (screens, input, audio, camera, games).
+
+[Unit]
+Description=FarFromHome handheld - UI
+Documentation=file:/opt/farfromhome/phone-app/docs/ARCHITECTURE.md
+After=farfromhome-engine.service
+Wants=farfromhome-engine.service
+# Start only once the panel exists, otherwise Qt exits and systemd restarts it in
+# a loop.
+After=systemd-user-sessions.service
+
+[Service]
+Type=simple
+User=farfromhome
+Group=farfromhome
+SupplementaryGroups=video audio input render
+WorkingDirectory=/opt/farfromhome/phone-app
+EnvironmentFile=-/etc/farfromhome/device.env
+# Qt on a Pi: the KMS/EGL path avoids X entirely, which is what a handheld wants.
+Environment=QT_QPA_PLATFORM=eglfs
+Environment=QT_QPA_EGLFS_INTEGRATION=eglfs_kms
+Environment=QT_QPA_EGLFS_ALWAYS_SET_MODE=1
+Environment=QT_LOGGING_RULES=qt.qpa.*=false
+ExecStart=/opt/farfromhome/phone-app/.venv/bin/python -m farfromhome_device.app.main ui
+Restart=always
+RestartSec=2
+StartLimitIntervalSec=0
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ffh-ui
+StateDirectory=farfromhome
+RuntimeDirectory=farfromhome
+# The UI needs the DRM device and input devices.
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/farfromhome /opt/farfromhome/phone-app/data
+DeviceAllow=/dev/dri rw
+DeviceAllow=/dev/input rw
+DeviceAllow=/dev/video0 rw
+
+[Install]
+WantedBy=graphical.target

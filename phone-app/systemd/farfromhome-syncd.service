@@ -1,0 +1,36 @@
+# FarFromHome handheld — syncd (outbox, uploads, retries).
+
+[Unit]
+Description=FarFromHome handheld - syncd (offline queue uploader)
+Documentation=file:/opt/farfromhome/phone-app/docs/ARCHITECTURE.md
+After=network-online.target time-sync.target
+Wants=network-online.target time-sync.target
+# This is the only process that needs the server, so it is the only one that cares
+# whether the network is up. It keeps retrying with backoff when it is not.
+
+[Service]
+Type=simple
+User=farfromhome
+Group=farfromhome
+WorkingDirectory=/opt/farfromhome/phone-app
+EnvironmentFile=-/etc/farfromhome/device.env
+Nice=10
+CPUWeight=30
+IOSchedulingClass=idle
+ExecStart=/opt/farfromhome/phone-app/.venv/bin/python -m farfromhome_device.app.main syncd
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=0
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ffh-syncd
+StateDirectory=farfromhome
+RuntimeDirectory=farfromhome
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/farfromhome /opt/farfromhome/phone-app/data
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,51 @@
+# FarFromHome handheld — the agent (planner) process.
+#
+# Three separate processes (agent, engine, ui) plus syncd run side by side, exactly
+# as the brief's process model describes, so one can be restarted without killing
+# the others. They share the SQLite database and the local bus.
+#
+# Install:
+#   sudo cp systemd/*.service /etc/systemd/system/
+#   sudo cp .env.example /etc/farfromhome/device.env   # then edit it
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now farfromhome-agent farfromhome-engine farfromhome-ui farfromhome-syncd
+
+[Unit]
+Description=FarFromHome handheld - agent (planner)
+Documentation=file:/opt/farfromhome/phone-app/docs/ARCHITECTURE.md
+After=network-online.target time-sync.target
+Wants=network-online.target time-sync.target
+# systemd-timesyncd first: the server de-duplicates GPS points by timestamp, so a
+# Pi with a wrong clock looks like it is replaying an old trip.
+
+[Service]
+Type=simple
+User=farfromhome
+Group=farfromhome
+WorkingDirectory=/opt/farfromhome/phone-app
+EnvironmentFile=-/etc/farfromhome/device.env
+# Keep CPU use low (brief §3): one worker thread, below-normal priority, and the
+# planner only wakes when a trip is requested.
+Nice=5
+CPUWeight=50
+IOSchedulingClass=best-effort
+IOSchedulingPriority=5
+ExecStart=/opt/farfromhome/phone-app/.venv/bin/python -m farfromhome_device.app.main agent
+Restart=always
+RestartSec=3
+# Restart forever: a trip in progress must not be lost to a crash (brief §12).
+StartLimitIntervalSec=0
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ffh-agent
+StateDirectory=farfromhome
+RuntimeDirectory=farfromhome
+# Hardening. The handheld needs no privileges beyond its own data directory.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/farfromhome /opt/farfromhome/phone-app/data
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Travel Ticket Studio</title>
+<style>
+:root{color-scheme:dark;--bg:#111;--panel:#1b1b1b;--line:#333;--muted:#aaa;--accent:#dfb96e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f4f1ea;font:14px/1.45 system-ui,Segoe UI,sans-serif}
+header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font-size:20px;margin:0}header p{margin:4px 0 0;color:var(--muted)}
+main{display:grid;grid-template-columns:minmax(280px,360px) 1fr;gap:20px;padding:20px;max-width:1400px;margin:auto}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;height:max-content}
+h2{font-size:15px;margin:0 0 14px}label{display:block;margin:12px 0 5px;color:#d5d0c5}
+input,select,textarea{width:100%;padding:10px;border:1px solid #454545;background:#101010;color:#f7f4ed;border-radius:8px;font:inherit}
+input[type=color]{height:40px;padding:4px}input[type=file]{padding:8px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+button{border:0;border-radius:8px;padding:10px 13px;font-weight:650;background:var(--accent);color:#17130b;cursor:pointer}
+button.secondary{background:#303030;color:#eee;border:1px solid #444}
+.preview{min-width:0;background:#080808;border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.preview svg{display:block;width:100%;height:auto;max-height:78vh;object-fit:contain}
+.note{color:var(--muted);font-size:12px}.status{min-height:18px;color:#b8dba7;font-size:12px}
+@media(max-width:800px){main{grid-template-columns:1fr;padding:12px}.preview{padding:8px}.preview svg{max-height:none}}
+</style></head><body>
+<header><div><h1>Travel Ticket Studio</h1><p>Customize a printable SVG ticket for every adventure.</p></div><span class="note">SVG editor · local browser app</span></header>
+<main>
+<section class="panel">
+<h2>Ticket details</h2>
+<label>Template</label><select id="template"><option value="portrait">Portrait · collectible ticket</option><option value="landscape">Landscape · travel stub</option></select>
+<label>Destination name</label><input id="dest" value="MUNNAR" maxlength="32">
+<div class="row"><div><label>Travel distance</label><input id="distance" value="12.4 km"></div><div><label>Time taken</label><input id="duration" value="45 min"></div></div>
+<div class="row"><div><label>Rating (out of 5)</label><select id="rating"><option value="5">5 / 5</option><option value="4" selected>4 / 5</option><option value="3">3 / 5</option><option value="2">2 / 5</option><option value="1">1 / 5</option><option value="0">Not rated</option></select></div><div><label>Ticket date</label><input id="date" type="date" value="2026-10-11"></div></div>
+<label>QR destination link</label><input id="url" type="url" placeholder="https://maps.google.com/...">
+<p class="note">Paste a map link, post link, or any URL. QR is added when you export.</p>
+<label>Photo / map screenshot</label><input id="photo" type="file" accept="image/*">
+<div class="row"><div><label>Ticket accent</label><input id="accent" type="color" value="#dfb96e"></div><div><label>Tagline</label><input id="tagline" value="A LITTLE WAY OFF THE MAP" maxlength="45"></div></div>
+<div class="actions"><button id="export">Export SVG</button><button class="secondary" id="png">Export PNG</button><button class="secondary" id="reset">Reset</button></div>
+<div id="status" class="status"></div>
+<p class="note">The SVG export embeds your uploaded image. QR creation uses a public QR endpoint, so internet is needed when exporting a ticket with a link.</p>
+</section>
+<section class="preview"><div class="note">LIVE PREVIEW</div><div id="canvas" style="width:100%;max-width:900px"></div><div class="note">Use Export SVG for a scalable, editable file. Open it in Inkscape, Illustrator, or a browser.</div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let templates={}, photoData='';
+const paths={portrait:'templates/travel-ticket-portrait.svg',landscape:'templates/travel-ticket-landscape.svg'};
+async function loadTemplate(){templates[$('template').value]=await (await fetch(paths[$('template').value])).text();render();}
+function escapeXml(s){return String(s).replace(/[<>&'"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]));}
+function dateText(){const v=$('date').value;if(!v)return 'DATE';const d=new Date(v+'T12:00:00');return $('template').value==='portrait'?String(d.getDate()).padStart(2,'0'):d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();}
+function buildSvg(){let s=templates[$('template').value]||'';if(!s)return '';
+const isP=$('template').value==='portrait';
+const setText=(id,text)=>{const re=new RegExp('(<text id="'+id+'"[^>]*>)[\\\\s\\\\S]*?(</text>)');s=s.replace(re,'$1'+escapeXml(text)+'$2');};
+setText('destination',$('dest').value.toUpperCase()||'DESTINATION');
+setText('distance','DISTANCE · '+($('distance').value||'—').toUpperCase());
+setText('duration','TIME · '+($('duration').value||'—').toUpperCase());
+const n=Number($('rating').value);setText('rating',n===0?'RATING · NOT RATED':'RATING · '+'★'.repeat(n)+'☆'.repeat(5-n)+' '+n+'/5');
+setText('ticket-date',dateText());
+if(isP){setText('ticket-year',($('date').value||'2026-01-01').slice(0,4));setText('subtitle',$('tagline').value);}
+else setText('subtitle',$('tagline').value);
+s=s.replace(/<rect x="24" y="503" width="312" height="237" rx="0" fill="[^"]+"\/>/,'<rect x="24" y="503" width="312" height="237" rx="0" fill="'+$('accent').value+'"/>');
+if(photoData){s=s.replace(/<image id="place-image"([^>]*?)href="[^"]*"\/>/,'<image id="place-image"$1href="'+photoData+'"/>');}
+return s;}
+function render(){const s=buildSvg();if(s)$('canvas').innerHTML=s;}
+document.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',render));
+$('template').addEventListener('change',loadTemplate);
+$('photo').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{photoData=r.result;render();};r.readAsDataURL(f);});
+function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
+async function qrData(url){const endpoint='https://api.qrserver.com/v1/create-qr-code/?size=220x220&format=png&data='+encodeURIComponent(url);const res=await fetch(endpoint);if(!res.ok)throw new Error('QR service unavailable');const blob=await res.blob();return await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob);});}
+function addQr(svg,data){const isP=$('template').value==='portrait';const x=isP?244:772,y=isP?548:290,w=isP?68:72,h=isP?68:72;
+const qr=`<image x="${x}" y="${y}" width="${w}" height="${h}" href="${data}" xlink:href="${data}" preserveAspectRatio="none"/>`;
+return svg.replace(/<g id="qr-slot">[\s\S]*?<\/g>/,`<g id="qr-slot">${qr}</g>`);}
+$('export').onclick=async()=>{try{$('status').textContent='Preparing SVG…';let s=buildSvg();if($('url').value.trim())s=addQr(s,await qrData($('url').value.trim()));download(($('dest').value||'travel-ticket').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.svg',new Blob([s],{type:'image/svg+xml;charset=utf-8'}));$('status').textContent='SVG exported.';}catch(e){$('status').textContent='Could not create QR. Check the link/internet and try again.';}};
+$('png').onclick=async()=>{try{let s=buildSvg();if($('url').value.trim())s=addQr(s,await qrData($('url').value.trim()));const blob=new Blob([s],{type:'image/svg+xml'}),u=URL.createObjectURL(blob),img=new Image();img.onload=()=>{const svg=document.querySelector('#canvas svg');const c=document.createElement('canvas');c.width=svg.viewBox.baseVal.width*2;c.height=svg.viewBox.baseVal.height*2;c.getContext('2d').drawImage(img,0,0,c.width,c.height);c.toBlob(b=>download('travel-ticket.png',b));URL.revokeObjectURL(u);};img.onerror=()=>{URL.revokeObjectURL(u);$('status').textContent='PNG export failed. Try SVG export.'};img.src=u;}catch(e){$('status').textContent='PNG export failed. Try again.'}};
+$('reset').onclick=()=>{location.reload();};
+loadTemplate();
+</script></body></html>
