@@ -1,143 +1,287 @@
-# FarFromHome (FFH) — Blind-Trip Travel Device Server & Web Platform
+# RoamDeck by Far From Home
 
-**FarFromHome** is the companion server and social platform for a handheld Raspberry Pi 5 blind-trip exploration device. 
+> A Raspberry Pi-powered AI travel companion that turns every walk into a quest.
 
-The device guides travelers using only a pointing magnetic compass — **the destination remains strictly secret until arrival**. Along the way, the device orchestrates photo tasks, bingo challenges, and group games. The companion web application powers explorer profiles, live boarding passes, photo timelines, passports, leaderboards, and instant phone game participation via QR code.
+RoamDeck is a handheld device that guides you with a compass arrow to hidden places, gives you photo quests, and connects you with friends without needing a phone app. Your phone opens a browser page. Your laptop acts as the local cloud. The Raspberry Pi is the adventure device.
 
----
+This repository contains the prototype code and documentation for **RoamDeck**, a project by **Far From Home**.
 
-## 1. Ground Rules & Spoiler Gating
-
-> [!IMPORTANT]
-> **The destination remains secret until the device reports arrival.**
-> The backend enforces this strictly via `serialize_trip(trip, viewer)`: while `destination_revealed` is `false`, destination coordinates, place names, categories, unrevealed recipe hints, and destination-category photos are redacted from all API responses for **every viewer, including the trip owner**.
 
 ---
 
-## 2. Tech Stack
+## What is RoamDeck?
 
-- **Backend**: Python 3.11+, FastAPI, Uvicorn, SQLite in WAL mode via SQLAlchemy 2
-- **Realtime**: WebSocket at `/ws` for live GPS breadcrumbs, arrival triggers, and game score updates
-- **Images**: Pillow for thumbnail generation and privacy-preserving EXIF stripping
-- **QR Codes**: Native `qrcode` generator served as PNG (`/api/games/{id}/qr.png`)
-- **Frontend**: Vite, React 19, TypeScript, Tailwind CSS, Leaflet OpenStreetMap, Recharts (5-axis radar), `jsbarcode`, `html-to-image`
-- **Weather**: Open-Meteo cached proxy (no external API key required)
+RoamDeck is a small handheld Raspberry Pi device with an SPI display, GPS, compass, camera, microphone, speaker, and buttons. It is designed to be carried on walks, trips, and adventures.
 
----
+Instead of staring at a map on your phone, RoamDeck gives you a single arrow. The arrow points toward a hidden destination. As you get closer, the device gives you clues, haptic feedback, and photo challenges.
 
-## 3. Quick Start
+Your phone is not the main device. It connects through a web browser to a laptop or cloud server. There is no app to install. The phone handles the social side: feed, invites, leaderboards, and collages.
 
-### Prerequisites
-- Python 3.11+
-- Node.js 18+ and npm
-
-### One-Command Setup
-
-1. **Install backend dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   # (or: pip install fastapi uvicorn sqlalchemy pillow qrcode pytest websockets httpx pydantic python-multipart)
-   ```
-
-2. **Install frontend dependencies & build:**
-   ```bash
-   cd frontend
-   npm install
-   npm run build
-   cd ..
-   ```
-
-3. **Seed demo data:**
-   ```bash
-   python tools/seed.py
-   ```
-
-4. **Start the server:**
-   ```bash
-   python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8888
-   ```
-   Open your browser at **`http://localhost:8888`**. The entire application (both API and SPA frontend) runs seamlessly on a single port (**8888**)!
+RoamDeck is for people who want to explore, play, and share memories without being glued to a screen.
 
 ---
 
-## 4. Development Mode (Dual Ports)
+## The Story
 
-For hot-module reloading during development:
-- **Terminal 1 (Backend)**:
-  ```bash
-  python -m uvicorn backend.app.main:app --reload --port 8888
-  ```
-- **Terminal 2 (Frontend)**:
-  ```bash
-  cd frontend
-  npm run dev
-  ```
-  Vite runs on `http://localhost:5173` and proxies `/api` and `/ws` to port 8888.
+**Far From Home** is about leaving your comfort zone and finding new places. RoamDeck was built around that idea.
+
+The first prototype was a Raspberry Pi 4B with an SPI display, a GPS module, and a compass. The goal was simple: build a device that points you toward an adventure.
+
+Over time, the idea grew into a full social travel app. But the core stayed the same: one arrow, one destination, one story.
+
+**RoamDeck** is the next step. It is a dedicated device, a local server, and a browser-based social layer. No app store. No subscriptions. Just you, the device, and the world.
 
 ---
 
-## 5. Stamp Rarity Algorithm
+## Features
 
-Stamps are awarded automatically when the Pi reports arrival at `POST /device/trips/{id}/arrive`.
-Rarity score is computed as:
-$$\text{Score} = \text{Category Weight} + \min(\text{Distance}_{\text{km}}, 10) \times 0.3 + \text{Golden Hour Bonus}$$
-
-- **Category Weights**:
-  - Beach: 1.0, Park: 1.0, Cafe: 1.0
-  - Market: 2.0, Other: 2.0
-  - Temple / Heritage: 3.0, Viewpoint: 3.0
-- **Golden Hour Bonus**: +1.0 if arrival occurs within 1 hour of sunrise (~06:15) or sunset (~18:30).
-- **Rarity Tiers**:
-  - Score < 2.5: **Common** (`#7C97A0`)
-  - Score < 4.0: **Rare** (`#1F4B8F`)
-  - Score < 5.5: **Epic** (`#7B4FC2`)
-  - Score ≥ 5.5: **Legendary** (`#F2A33A`)
+- **Compass Arrow Navigation** — A single arrow points to your next destination.
+- **AI Trip Planner** — The server suggests routes and hidden places using AI.
+- **Photo Quests** — Take a photo to complete a challenge. The server verifies it.
+- **Bingo** — Complete a grid of travel tasks.
+- **Friend Meetup** — See friends on the same trip. When you get within 500 meters, the arrow turns off and walkie-talkie mode begins.
+- **Walkie-Talkie** — Push-to-talk voice chat over WebRTC.
+- **Social Feed** — Your phone browser shows photos, likes, comments, and trip memories.
+- **No Phone App** — The phone connects through a web page or PWA. No install required.
+- **Laptop as Local Cloud** — During development, your laptop runs the server. Later, move it to the cloud.
+- **Cloud-Ready** — The same server code can run on a VPS, Render, Railway, or Fly.io.
+- **Open Source** — Built with Python, Pygame, FastAPI, and open protocols.
 
 ---
 
-## 6. Demo Tooling & Simulator
+## How It Works
 
-### 1. Safety Control Panel (`/demo`)
-Navigate to `http://localhost:8888/demo` (enabled when `DEMO_MODE=true`):
-- **Seed Demo Data**: Instantly populates 6 Kozhikode explorers, 8 finished journeys, placeholder photos, and stamps.
-- **Start Fake Trip**: Creates an active blind trip with hidden destination `"???"` and live GPS coordinates.
-- **Trigger Arrival**: Simulates the Pi arriving at the destination, triggering the perforated boarding pass tear animation and stamp award.
-- **Start Fake Game**: Launches a photo hunt game with 3 simulated players.
-- **Reset Database**: Cleans SQLite tables and media directory.
+1. You turn on RoamDeck.
+2. The Raspberry Pi boots into a fullscreen Pygame app.
+3. The app fetches a target from the laptop server.
+4. It reads GPS and compass data.
+5. It calculates the distance and bearing to the target.
+6. It draws an arrow on the SPI display.
+7. As you move, the arrow updates.
+8. When you get close, the server sends a clue.
+9. You take a photo to complete the quest.
+10. Your phone browser shows the photo in the social feed.
 
-### 2. Standalone Fake Pi Simulator (`tools/fake_pi.py`)
-```bash
-# Simulate pairing handshake with web app
-python tools/fake_pi.py --pair
+The laptop server does the heavy work: AI, database, social feed, and photo verification. The Pi only handles the device UI and sensors.
 
-# Replay a full blind trip: post plan, send GPS breadcrumbs, reveal waypoint, arrive, finish
-python tools/fake_pi.py --trip
+---
 
-# Start a game session with 3 players
-python tools/fake_pi.py --game --players 3
+## Architecture
+
+```
++-----------------------------+
+|   Nemai's RoamDeck (Pi)     |
+|                             |
+|  - SPI display              |
+|  - GPS module               |
+|  - Compass / IMU            |
+|  - Camera                   |
+|  - Mic + Speaker            |
+|  - PTT button               |
+|  - Haptic motor             |
++-------------+---------------+
+              |
+              | Wi-Fi / Phone Hotspot
+              |
+              v
++-----------------------------+
+|   Laptop / Cloud Server     |
+|                             |
+|  - FastAPI / HTTP server    |
+|  - SQLite / PostgreSQL      |
+|  - AI trip planner          |
+|  - Photo verification       |
+|  - Social feed              |
+|  - WebSocket / WebRTC       |
++-------------+---------------+
+              ^
+              |
+              | Browser / PWA
+              |
++-----------------------------+
+|   Phone (No App Install)    |
+|                             |
+|  - Social feed              |
+|  - Invites                  |
+|  - Leaderboards             |
+|  - Collages                 |
+|  - Settings                 |
++-----------------------------+
 ```
 
----
-
-## 7. Event WiFi & Network Exposing
-
-> [!TIP]
-> Hackathon and venue WiFis frequently enable **client isolation**, which prevents phones from reaching laptop IP addresses directly.
-
-**Recommended Fallbacks:**
-1. **Phone Mobile Hotspot**: Connect your laptop and testing phones to the same mobile hotspot. Set `PUBLIC_BASE_URL="http://<your-hotspot-ip>:8888"` in `.env`.
-2. **Cloudflare Tunnel (Zero-config HTTPS)**:
-   ```bash
-   cloudflared tunnel --url http://localhost:8888
-   ```
-   Set `PUBLIC_BASE_URL` in `.env` to the resulting `https://...trycloudflare.com` address. This enables cameras and full HTTPS support on mobile phones without network restrictions.
+The Pi and the phone both connect to the same server. The Pi handles the journey. The phone handles the memories.
 
 ---
 
-## 8. Automated Tests
+## Hardware Requirements
 
-Run backend tests for spoiler gating, game lifecycle, pairing, and scoring:
+### Current Prototype
+
+- **Raspberry Pi 4B** (or Raspberry Pi Zero 2 W for a smaller final device)
+- **SPI Display** - ILI9341, ST7789, or similar
+- **GPS Module** - NEO-6M, NEO-M8N, or similar (UART)
+- **Compass** - QMC5883L or HMC5883L (I2C)
+- **IMU** - MPU6050 (optional, for better heading)
+- **Camera** - Raspberry Pi Camera Module
+- **Audio** - USB sound card or I2S mic/speaker
+- **Push Button** - For PTT and menu control
+- **Haptic Motor** - Vibration motor with transistor
+- **Power** - 5V 3A power bank or LiPo UPS HAT
+- **Storage** - 16GB or 32GB microSD card
+
+### Recommended for Final Device
+
+- Raspberry Pi Zero 2 W
+- Custom PCB for sensors and power
+- 3D-printed enclosure
+- LiPo battery with charging circuit
+- Smaller SPI display (240x240 or 320x240)
+
+---
+
+## Software Stack
+
+- **Raspberry Pi OS** - Desktop for development, Lite for final device
+- **Python 3** - Main programming language
+- **Pygame** - Draws the UI on the SPI display
+- **FastAPI** - Planned server framework
+- **SQLite / PostgreSQL** - Database for trips, users, and photos
+- **OpenAI / Anthropic API** - AI trip planning and photo verification
+- **Overpass API** - Finds nearby places and hidden gems
+- **WebRTC / LiveKit** - Walkie-talkie voice chat
+- **HTML / JavaScript** - Phone browser interface
+- **PWA** - Makes the browser page feel like an app without installing
+
+---
+
+## Getting Started
+
+### 1. Clone the Repository
+
 ```bash
-python -m pytest backend/tests
+git clone https://github.com/amionearth/RoamDeck.git
+cd roamdeck
 ```
-All tests run with zero external cloud dependencies.
+
+### 2. Install Pygame on the Pi
+
+```bash
+sudo apt update
+sudo apt install -y python3-pygame
+```
+
+### 3. Run the Server on Your Laptop
+
+```bash
+python3 roamquest.py --server
+```
+
+The server starts at `http://0.0.0.0:8000`.
+
+Open this URL on your phone:
+
+```
+http://YOUR_LAPTOP_IP:8000
+```
+
+You will see the RoamDeck server page with the current target.
+
+### 4. Run the Pi Client
+
+Edit `roamquest.py` and change `SERVER_URL` to your laptop's IP address:
+
+```python
+SERVER_URL = "http://192.168.1.50:8000"
+```
+
+Then run:
+
+```bash
+python3 roamquest.py --pi
+```
+
+If your SPI display uses KMS/DRM, run:
+
+```bash
+python3 roamquest.py --pi --kms
+```
+
+### 5. Test the Arrow
+
+The Pi should show an arrow pointing toward the target. The distance is shown at the top. The hint is shown at the bottom.
+
+If you are testing on HDMI first, it will work on a normal monitor.
+
+---
+
+## Configuration
+
+All settings are at the top of `roamquest.py`.
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SERVER_HOST` | Server bind address | `0.0.0.0` |
+| `SERVER_PORT` | Server port | `8000` |
+| `SERVER_URL` | URL the Pi uses to reach the server | `http://192.168.1.50:8000` |
+| `WIDTH` | Display width in pixels | `480` |
+| `HEIGHT` | Display height in pixels | `320` |
+| `FPS` | Frames per second | `20` |
+| `FAKE_LAT` | Fake latitude for testing | `12.9716` |
+| `FAKE_LON` | Fake longitude for testing | `77.5946` |
+| `FAKE_HEADING` | Fake compass heading in degrees | `0.0` |
+| `FALLBACK_TARGET` | Target used if server is offline | `{...}` |
+| `TARGETS` | Demo targets for the server | list of 4 places |
+
+When you connect real GPS and compass, replace `FAKE_LAT`, `FAKE_LON`, and `FAKE_HEADING` with live readings.
+
+---
+
+## API Reference
+
+### Current Prototype
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Phone-friendly server page |
+| `GET` | `/api/target` | Returns the current target as JSON |
+| `GET` | `/api/randomize` | Picks a new random target |
+
+Example response from `/api/target`:
+
+```json
+{
+  "lat": 12.9716,
+  "lon": 77.5946,
+  "hint": "Find the red door"
+}
+```
+
+### Planned Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/trip/plan` | AI plans a new trip |
+| `POST` | `/api/location` | Pi sends its location |
+| `GET` | `/api/quest/next` | Get the next quest |
+| `POST` | `/api/photo/upload` | Upload a photo for verification |
+| `GET` | `/api/feed` | Social feed |
+| `POST` | `/api/invite` | Invite a friend |
+| `WS` | `/ws/live` | Live location and events |
+
+---
+
+
+
+
+## License
+
+This project is licensed under the MIT License.
+
+You are free to use, modify, and distribute this software. See the `LICENSE` file for details.
+
+---
+
+
+
+> **RoamDeck is not about the destination. It is about the story you bring back.**  
+> - RoamDeck by Far From Home
