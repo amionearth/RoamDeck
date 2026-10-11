@@ -1,0 +1,29 @@
+{
+  "appId": "com.roamdeck.app",
+  "appName": "RoamDeck",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "allowNavigation": [
+      "http://localhost:8000",
+      "http://192.168.*.*:8000",
+      "http://10.*.*.*:8000",
+      "ws://localhost:8000",
+      "ws://192.168.*.*:8000"
+    ]
+  },
+  "plugins": {
+    "Geolocation": {
+      "permissions": ["location"]
+    },
+    "Camera": {
+      "saveToGallery": false
+    }
+  },
+  "android": {
+    "buildOptions": {
+      "keystorePath": null,
+      "keystoreAlias": null
+    }
+  }
+}

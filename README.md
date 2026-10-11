@@ -156,61 +156,40 @@ The Pi and the phone both connect to the same server. The Pi handles the journey
 
 ## Getting Started
 
-### 1. Clone the Repository
+### 1. Run the server on Windows (one click)
+
+The FastAPI server also serves the built website, so you only need to start one
+process. After Python and the server's Python dependencies are installed, double-click
+[`Start-FarFromHome.exe`](./Start-FarFromHome.exe). It starts the server without
+showing a terminal, waits for its health endpoint, and opens the site in your browser
+at `http://127.0.0.1:8000`.
+
+Double-click [`Stop-FarFromHome.exe`](./Stop-FarFromHome.exe) when you are finished.
+Server output and startup errors are saved in `data/launcher-logs/`. If the launcher
+cannot start the server, it shows an error and the log location.
+
+The launcher uses the repository's `.venv` if present, then `phone-app/.venv`, then
+Python on `PATH`. The frontend is served from `frontend/dist`; build it with
+`npm run build` from `frontend` if that directory is missing or out of date.
+
+For manual startup, open a terminal in the repository and run:
 
 ```bash
-git clone https://github.com/amionearth/RoamDeck.git
-cd roamdeck
+python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
 ```
 
-### 2. Install Pygame on the Pi
+On the same computer, open `http://127.0.0.1:8000`. For a phone on the same Wi-Fi,
+open the laptop's Wi-Fi IP on port `8000` (for example `http://192.168.1.50:8000`).
+Allow Python through Windows Firewall when prompted if phones need to connect.
+
+### 2. Run the handheld client on a Raspberry Pi
 
 ```bash
-sudo apt update
-sudo apt install -y python3-pygame
+cd phone-app
+python run.py
 ```
 
-### 3. Run the Server on Your Laptop
-
-```bash
-python3 roamquest.py --server
-```
-
-The server starts at `http://0.0.0.0:8000`.
-
-Open this URL on your phone:
-
-```
-http://YOUR_LAPTOP_IP:8000
-```
-
-You will see the RoamDeck server page with the current target.
-
-### 4. Run the Pi Client
-
-Edit `roamquest.py` and change `SERVER_URL` to your laptop's IP address:
-
-```python
-SERVER_URL = "http://192.168.1.50:8000"
-```
-
-Then run:
-
-```bash
-python3 roamquest.py --pi
-```
-
-If your SPI display uses KMS/DRM, run:
-
-```bash
-python3 roamquest.py --pi --kms
-```
-
-### 5. Test the Arrow
-
-The Pi should show an arrow pointing toward the target. The distance is shown at the top. The hint is shown at the bottom.
-
-If you are testing on HDMI first, it will work on a normal monitor.
+For laptop testing without Pi hardware, see [`phone-app/README.md`](./phone-app/README.md).
 
 ---
 

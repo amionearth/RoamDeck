@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <title>RoamDeck</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+  <!-- ── SPLASH ───────────────────────────────────────────── -->
+  <div id="splash" class="splash">
+    <div class="splash-logo">
+      <div class="splash-icon">🧭</div>
+      <h1>RoamDeck</h1>
+      <p>Your Blind Trip Companion</p>
+    </div>
+    <div class="splash-spinner"></div>
+  </div>
+
+  <!-- ── AUTH SCREEN ──────────────────────────────────────── -->
+  <div id="auth-screen" class="screen hidden">
+    <div class="auth-hero">
+      <div class="auth-icon">🧭</div>
+      <h1>RoamDeck</h1>
+      <p class="auth-tagline">Adventure without a destination</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Sign In</button>
+      <button class="auth-tab" data-tab="register">Register</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" class="auth-form">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="login-username" placeholder="your_username" autocomplete="username" required />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+      </div>
+      <div id="login-error" class="form-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+    </form>
+
+    <!-- Register Form -->
+    <form id="register-form" class="auth-form hidden">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="reg-username" placeholder="explorer42" autocomplete="username" required />
+      </div>
+      <div class="form-group">
+        <label>Display Name</label>
+        <input type="text" id="reg-display" placeholder="Alex Explorer" required />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="min 4 chars" autocomplete="new-password" required />
+      </div>
+      <div class="form-group">
+        <label>Home City</label>
+        <input type="text" id="reg-city" placeholder="Kozhikode" />
+      </div>
+      <div id="reg-error" class="form-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+    </form>
+
+    <p class="auth-server-note">
+      Connecting to <span id="server-addr-display">...</span>
+      <button class="btn-link" id="change-server-btn">Change</button>
+    </p>
+  </div>
+
+  <!-- ── SERVER CONFIG MODAL ──────────────────────────────── -->
+  <div id="server-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3>Server Address</h3>
+      <p>Enter the IP/hostname of your RoamDeck server. The app calls port 8000.</p>
+      <div class="form-group">
+        <label>Server Host</label>
+        <input type="text" id="server-host-input" placeholder="192.168.1.100" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="server-modal-cancel">Cancel</button>
+        <button class="btn btn-primary" id="server-modal-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN APP ──────────────────────────────────────────── -->
+  <div id="main-app" class="hidden">
+
+    <!-- Top bar -->
+    <header class="top-bar">
+      <button class="icon-btn" id="back-btn" style="display:none">&#8592;</button>
+      <h2 id="page-title">Feed</h2>
+      <div class="top-bar-right">
+        <button class="icon-btn" id="notif-btn" title="Notifications">&#128276;</button>
+      </div>
+    </header>
+
+    <!-- Page container -->
+    <main id="pages">
+
+      <!-- ── FEED PAGE ─────────────────────────────────────── -->
+      <section id="page-feed" class="page active">
+        <div class="feed-header">
+          <h2>Explore</h2>
+          <button class="btn btn-sm btn-outline" id="feed-refresh-btn">&#8635; Refresh</button>
+        </div>
+        <div id="feed-list" class="feed-list">
+          <div class="skeleton-list">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+        </div>
+        <button id="feed-load-more" class="btn btn-ghost btn-full" style="display:none">Load more</button>
+      </section>
+
+      <!-- ── TRIP DETAIL PAGE ─────────────────────────────── -->
+      <section id="page-trip" class="page hidden">
+        <div id="trip-detail-content"></div>
+      </section>
+
+      <!-- ── PASSPORT PAGE ────────────────────────────────── -->
+      <section id="page-passport" class="page hidden">
+        <div class="passport-header">
+          <div class="passport-cover">
+            <div class="passport-icon">📖</div>
+            <div id="passport-stats"></div>
+          </div>
+        </div>
+        <div id="passport-stamps" class="stamps-grid"></div>
+      </section>
+
+      <!-- ── GAME LOBBY PAGE ──────────────────────────────── -->
+      <section id="page-game" class="page hidden">
+        <div class="game-join-panel" id="game-join-panel">
+          <div class="game-join-icon">🎮</div>
+          <h2>Join a Game</h2>
+          <p>Enter the 6-letter code shown on the host screen</p>
+          <div class="form-group">
+            <input type="text" id="game-code-input" placeholder="ABCDEF" maxlength="6"
+              style="text-transform:uppercase; text-align:center; font-size:1.5rem; letter-spacing:0.3em" />
+          </div>
+          <button class="btn btn-primary btn-full" id="game-look-btn">Look Up Game</button>
+        </div>
+
+        <div id="game-info-panel" class="hidden">
+          <div id="game-info-header"></div>
+          <div id="game-players-list"></div>
+          <div class="form-group">
+            <label>Your Display Name</label>
+            <input type="text" id="game-player-name" placeholder="Alex" />
+          </div>
+          <button class="btn btn-primary btn-full" id="game-join-btn">Join Game</button>
+          <div id="game-join-error" class="form-error hidden"></div>
+        </div>
+      </section>
+
+      <!-- ── ACTIVE GAME PAGE ─────────────────────────────── -->
+      <section id="page-active-game" class="page hidden">
+        <div class="game-hud">
+          <div class="game-hud-left">
+            <div id="game-player-badge" class="player-badge"></div>
+          </div>
+          <div class="game-hud-center">
+            <div id="game-timer" class="game-timer">--:--</div>
+            <div id="game-status-label" class="game-status-label">Waiting</div>
+          </div>
+          <div class="game-hud-right">
+            <div id="game-my-score" class="game-score">0 pts</div>
+          </div>
+        </div>
+
+        <div id="game-tabs" class="tab-strip">
+          <button class="tab-btn active" data-gtab="tasks">Tasks</button>
+          <button class="tab-btn" data-gtab="gallery">Gallery</button>
+          <button class="tab-btn" data-gtab="scores">Scores</button>
+        </div>
+
+        <div id="gtab-tasks" class="gtab active">
+          <div id="task-list" class="task-list"></div>
+        </div>
+
+        <div id="gtab-gallery" class="gtab hidden">
+          <p class="hint-text">Vote on other players' photos</p>
+          <div id="gallery-list" class="gallery-grid"></div>
+          <button class="btn btn-outline btn-full" id="gallery-refresh-btn">&#8635; Refresh</button>
+        </div>
+
+        <div id="gtab-scores" class="gtab hidden">
+          <div id="scoreboard-list" class="scoreboard-list"></div>
+          <button class="btn btn-outline btn-full" id="scores-refresh-btn">&#8635; Refresh</button>
+        </div>
+      </section>
+
+      <!-- ── LEADERBOARD PAGE ──────────────────────────────── -->
+      <section id="page-leaderboard" class="page hidden">
+        <div class="lb-controls">
+          <select id="lb-scope">
+            <option value="global">Global</option>
+            <option value="friends">Friends</option>
+          </select>
+          <select id="lb-metric">
+            <option value="points">Points</option>
+            <option value="places">Places</option>
+            <option value="photos">Photos</option>
+          </select>
+        </div>
+        <div id="leaderboard-list" class="leaderboard-list"></div>
+      </section>
+
+      <!-- ── FRIENDS PAGE ──────────────────────────────────── -->
+      <section id="page-friends" class="page hidden">
+        <div class="friends-search">
+          <input type="text" id="friend-search-input" placeholder="Search username or friend code…" />
+          <button class="btn btn-primary" id="friend-search-btn">Search</button>
+        </div>
+        <div id="friend-search-results" class="hidden"></div>
+
+        <h3 class="section-title">Friend Requests</h3>
+        <div id="friend-requests-list"></div>
+
+        <h3 class="section-title">My Friends</h3>
+        <div id="friends-list"></div>
+
+        <div class="friend-code-card">
+          <p>Your friend code</p>
+          <div id="my-friend-code" class="friend-code-badge">—</div>
+          <button class="btn btn-outline btn-sm" id="copy-friend-code-btn">Copy</button>
+        </div>
+      </section>
+
+      <!-- ── PROFILE PAGE ──────────────────────────────────── -->
+      <section id="page-profile" class="page hidden">
+        <div class="profile-header">
+          <div class="avatar-wrap" id="avatar-wrap">
+            <img id="profile-avatar" src="img/default-avatar.svg" alt="avatar" class="profile-avatar" />
+            <button class="avatar-edit-btn" id="avatar-edit-btn">📷</button>
+          </div>
+          <h2 id="profile-display-name">—</h2>
+          <p id="profile-rank-title" class="rank-chip">—</p>
+          <p id="profile-xp" class="xp-label">0 XP</p>
+        </div>
+
+        <div class="profile-stats-row">
+          <div class="stat-box">
+            <div id="pstat-stamps">—</div>
+            <label>Stamps</label>
+          </div>
+          <div class="stat-box">
+            <div id="pstat-trips">—</div>
+            <label>Trips</label>
+          </div>
+          <div class="stat-box">
+            <div id="pstat-friends">—</div>
+            <label>Friends</label>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Edit Profile</h3>
+          <form id="edit-profile-form">
+            <div class="form-group">
+              <label>Display Name</label>
+              <input type="text" id="edit-display-name" />
+            </div>
+            <div class="form-group">
+              <label>Bio</label>
+              <textarea id="edit-bio" rows="3" placeholder="Tell your story…"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Home City</label>
+              <input type="text" id="edit-home-city" />
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+        </div>
+
+        <div class="profile-section">
+          <button class="btn btn-danger btn-full" id="logout-btn">Sign Out</button>
+        </div>
+      </section>
+
+    </main><!-- /pages -->
+
+    <!-- Bottom nav -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-page="feed">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Feed</span>
+      </button>
+      <button class="nav-btn" data-page="passport">
+        <span class="nav-icon">📖</span>
+        <span class="nav-label">Passport</span>
+      </button>
+      <button class="nav-btn" data-page="game">
+        <span class="nav-icon">🎮</span>
+        <span class="nav-label">Game</span>
+      </button>
+      <button class="nav-btn" data-page="leaderboard">
+        <span class="nav-icon">🏆</span>
+        <span class="nav-label">Ranks</span>
+      </button>
+      <button class="nav-btn" data-page="friends">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Friends</span>
+      </button>
+      <button class="nav-btn" data-page="profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Me</span>
+      </button>
+    </nav>
+
+  </div><!-- /main-app -->
+
+  <!-- ── PHOTO SUBMIT MODAL ────────────────────────────────── -->
+  <div id="photo-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 id="photo-modal-task-title">Submit Photo</h3>
+      <div id="photo-preview-wrap" class="photo-preview-wrap">
+        <img id="photo-preview" src="" alt="preview" class="hidden" />
+        <button class="btn btn-outline" id="take-photo-btn">📷 Take / Choose Photo</button>
+      </div>
+      <div class="form-group">
+        <label>Caption (optional)</label>
+        <input type="text" id="photo-caption" placeholder="Describe your find…" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="photo-modal-cancel">Cancel</button>
+        <button class="btn btn-primary" id="photo-submit-btn" disabled>Submit</button>
+      </div>
+      <div id="photo-submit-error" class="form-error hidden"></div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ─────────────────────────────────────────────── -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Capacitor runtime (injected by native shell; no-op in browser) -->
+  <script>
+    // Stub so imports don't throw in plain browser dev mode
+    window.CapacitorStub = true;
+  </script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

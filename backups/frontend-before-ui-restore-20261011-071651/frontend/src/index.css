@@ -1,0 +1,88 @@
+@import "./styles/glass.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    color: var(--color-ink);
+    font-family: 'Figtree', system-ui, sans-serif;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: 'Gloock', Georgia, serif;
+  }
+}
+
+/* Notched ticket edges using radial-gradient masks */
+.ticket-mask-horizontal {
+  mask-image: radial-gradient(circle at 0px 50%, transparent 14px, black 15px),
+              radial-gradient(circle at 100% 50%, transparent 14px, black 15px);
+  mask-composite: intersect;
+  -webkit-mask-image: radial-gradient(circle at 0px 50%, transparent 14px, black 15px),
+                      radial-gradient(circle at 100% 50%, transparent 14px, black 15px);
+  -webkit-mask-composite: source-in;
+}
+
+.ticket-mask-vertical {
+  mask-image: radial-gradient(circle at 50% 0px, transparent 14px, black 15px),
+              radial-gradient(circle at 50% 100%, transparent 14px, black 15px);
+  mask-composite: intersect;
+  -webkit-mask-image: radial-gradient(circle at 50% 0px, transparent 14px, black 15px),
+                      radial-gradient(circle at 50% 100%, transparent 14px, black 15px);
+  -webkit-mask-composite: source-in;
+}
+
+/* Destination Reveal Tear Animation */
+@keyframes tearAway {
+  0% {
+    transform: rotate(0deg) translate(0, 0);
+    opacity: 1;
+  }
+  40% {
+    transform: rotate(6deg) translate(15px, 25px);
+    opacity: 0.8;
+  }
+  100% {
+    transform: rotate(18deg) translate(40px, 90px);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@keyframes stampThunk {
+  0% {
+    transform: scale(2.2) rotate(-8deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(0.95) rotate(-2deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-tear {
+  animation: tearAway 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.animate-thunk {
+  animation: stampThunk 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-tear {
+    animation: none;
+    opacity: 0;
+  }
+  .animate-thunk {
+    animation: none;
+    opacity: 1;
+  }
+}

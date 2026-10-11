@@ -2,58 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%230B0B0D'/><polygon points='50,20 62,55 50,48 38,55' fill='%23FFD400'/><polygon points='50,80 62,45 50,52 38,45' fill='%23C9A800'/></svg>" />
-
-    <!--
-      viewport-fit=cover is what makes env(safe-area-inset-*) work, so the tab bar clears
-      the iPhone home indicator and the Android gesture bar. maximum-scale is deliberately
-      NOT set to 1: pinch-zoom must keep working for anyone who needs it.
-    -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-
-    <!-- Matches the app canvas, so the browser chrome and the status bar blend in. -->
-    <meta name="theme-color" content="#0B0B0D" />
-    <meta name="color-scheme" content="dark light" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="FarFromHome" />
-    <meta name="format-detection" content="telephone=no" />
-
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%231E7F85'/><polygon points='50,20 62,55 50,48 38,55' fill='white'/><polygon points='50,80 62,45 50,52 38,45' fill='%23F2A33A'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FarFromHome — Blind Trip Companion</title>
-
-    <!-- Fonts: Figtree (body), Gloock (display, website only) and Caveat Brush (handwritten).
-         Preconnect first so the first paint is not waiting on a handshake. -->
+    <!-- Fonts: Gloock (display), Figtree (body), Caveat Brush (handwritten) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Figtree:ital,wght@0,300..900;1,300..900&family=Gloock&display=swap" rel="stylesheet">
-
-    <!-- Leaflet is used by the website's trip map. It is loaded here rather than in the
-         app so the mobile shell can ignore it entirely. -->
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-
-    <style>
-      /* Painted before React mounts, so there is never a white flash on a dark app. */
-      html, body { margin: 0; background: #0B0B0D; }
-      #root { min-height: 100dvh; }
-      @media (prefers-color-scheme: light) {
-        /* The website is light; the mobile shell sets its own background. */
-        body.shell-web { background: #E8EDEE; }
-      }
-    </style>
   </head>
-  <body>
+  <body class="bg-fog text-ink font-sans antialiased min-h-screen selection:bg-lagoon selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      // Give the website its own background without making the mobile shell flash.
-      try {
-        if (!/shell=mobile/.test(location.search) && !window.Capacitor?.isNativePlatform?.()) {
-          document.body.classList.add("shell-web");
-        }
-      } catch (error) {
-        /* nothing depends on this */
-      }
-    </script>
   </body>
 </html>
